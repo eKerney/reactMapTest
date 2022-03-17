@@ -3,9 +3,10 @@ import Map, {Source, Layer} from 'react-map-gl';
 import DeckGL from '@deck.gl/react';
 import {LineLayer} from '@deck.gl/layers';
 import {render} from 'react-dom';
-import {HexagonLayer} from '@deck.gl/aggregation-layers';
 import { H3HexagonLayer } from "@deck.gl/geo-layers";
-
+import {ScatterplotLayer} from '@deck.gl/layers';
+import {CSVLoader} from '@loaders.gl/csv';
+import {parse} from '@loaders.gl/core';
 //import {useState, useEffect, useMemo, useCallback} from 'react';
 //import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
 
@@ -28,11 +29,53 @@ const data = [
 ];
   const HEX_DATA =
   "https://raw.githubusercontent.com/chriszrc/foss4g-2021-react-mapbox/main/deck-layers-map/public/data/hex_radio_coverage.json";
+  const stationData = 'https://raw.githubusercontent.com/eKerney/reactMapTest/main/src/noaaApt.csv';
+  const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/3d-heatmap/heatmap-data.csv';
 
   export default function App() {
-    
+    const layerStations = new ScatterplotLayer({
+      id: 'scatterplot-layer',
+      data: fetch(stationData)
+        .then(response => response.arrayBuffer())
+        .then(buffer => CSVLoader.parse(buffer)),
+      pickable: true,
+      opacity: 0.8,
+      stroked: true,
+      filled: true,
+      radiusScale: 6,   
+      radiusMinPixels: 10,
+      radiusMaxPixels: 100,
+      lineWidthMinPixels: 1,
+      getPosition: d => [d['lon'], d['lat']],
+      getRadius: d => Math.sqrt(d.exits),
+      getFillColor: d => [255, 140, 0],
+      getLineColor: d => [0, 0, 0]
+    });  
+   
+    const layerUK = new ScatterplotLayer({
+      id: 'scatterplot-layer',
+      data: fetch(testData)
+        .then(response => response.arrayBuffer())
+        .then(buffer => CSVLoader.parse(buffer)),
+      pickable: true,
+      opacity: 0.8,
+      stroked: true,
+      filled: true,
+      radiusScale: 6,
+      radiusMinPixels: 10,
+      radiusMaxPixels: 100,
+      lineWidthMinPixels: 1,
+      getPosition: d => [d['lng'], d['lat']],
+      getRadius: d => Math.sqrt(d.exits),
+      getFillColor: d => [255, 140, 0],
+      getLineColor: d => [0, 0, 0]
+    });
+
+
+    const lineTest = new LineLayer({id: 'line-layer', data});
+
     const layers = [
-     new LineLayer({id: 'line-layer', data}),
+    new LineLayer({id: 'line-layer', data}),
      new H3HexagonLayer({
       id: "H3 Radio Sources",
       data: HEX_DATA,
@@ -78,7 +121,7 @@ const data = [
     <DeckGL 
       initialViewState={viewState} 
       controller={true}
-      layers={[layers]}
+      layers={[layerUK]}
       >
       <Map 
         mapStyle="mapbox://styles/erickerney/cl0l6ydmk000d14slnsws819a" 
