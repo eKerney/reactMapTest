@@ -29,7 +29,7 @@ const data = [
 ];
   const HEX_DATA =
   "https://raw.githubusercontent.com/chriszrc/foss4g-2021-react-mapbox/main/deck-layers-map/public/data/hex_radio_coverage.json";
-  const stationData = 'https://raw.githubusercontent.com/eKerney/reactMapTest/main/src/noaaApt.csv';
+  const stationData = 'https://raw.githubusercontent.com/eKerney/reactMapTest/main/src/noaaAptEdited.csv';
   const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/3d-heatmap/heatmap-data.csv';
 
   export default function App() {
@@ -43,7 +43,7 @@ const data = [
       stroked: true,
       filled: true,
       radiusScale: 6,   
-      radiusMinPixels: 10,
+      radiusMinPixels: 5,
       radiusMaxPixels: 100,
       lineWidthMinPixels: 1,
       getPosition: d => [d['lon'], d['lat']],
@@ -121,7 +121,7 @@ const data = [
     <DeckGL 
       initialViewState={viewState} 
       controller={true}
-      layers={[layerUK]}
+      layers={[layerStations]}
       >
       <Map 
         mapStyle="mapbox://styles/erickerney/cl0l6ydmk000d14slnsws819a" 
