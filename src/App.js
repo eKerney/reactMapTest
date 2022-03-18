@@ -1,13 +1,12 @@
 import * as React from 'react';
-import Map, {Source, Layer} from 'react-map-gl';
+import Map, {Source, Layer, Popup} from 'react-map-gl';
 import DeckGL from '@deck.gl/react';
 import {LineLayer} from '@deck.gl/layers';
 import {render} from 'react-dom';
 import { H3HexagonLayer } from "@deck.gl/geo-layers";
 import {ScatterplotLayer} from '@deck.gl/layers';
 import {CSVLoader} from '@loaders.gl/csv';
-import {parse} from '@loaders.gl/core';
-//import {useState, useEffect, useMemo, useCallback} from 'react';
+import {useState, useEffect, useMemo, useCallback, useRef} from 'react';
 //import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
 
 const geojson = {
@@ -27,11 +26,13 @@ const layerStyle = {
 const data = [
   {sourcePosition: [-150, 41], targetPosition: [-50, 43]}
 ];
-  const HEX_DATA =
+const HEX_DATA =
   "https://raw.githubusercontent.com/chriszrc/foss4g-2021-react-mapbox/main/deck-layers-map/public/data/hex_radio_coverage.json";
-  const stationData = 'https://raw.githubusercontent.com/eKerney/reactMapTest/main/src/noaaAptEdited.csv';
+  const stationData = 'https://raw.githubusercontent.com/eKerney/reactMapTest/main/src/noaaAptEditedCol.csv';
   const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/3d-heatmap/heatmap-data.csv';
 
+
+  
   export default function App() {
     const layerStations = new ScatterplotLayer({
       id: 'scatterplot-layer',
@@ -39,17 +40,19 @@ const data = [
         .then(response => response.arrayBuffer())
         .then(buffer => CSVLoader.parse(buffer)),
       pickable: true,
-      opacity: 0.8,
+      opacity: 0.5,
       stroked: true,
       filled: true,
       radiusScale: 6,   
-      radiusMinPixels: 5,
+      radiusMinPixels: 10,
       radiusMaxPixels: 100,
       lineWidthMinPixels: 1,
       getPosition: d => [d['lon'], d['lat']],
       getRadius: d => Math.sqrt(d.exits),
-      getFillColor: d => [255, 140, 0],
-      getLineColor: d => [0, 0, 0]
+      getFillColor: d => [(255-(d['elevation']*.1)), (140+(d['elevation']*.001)), (d['elevation']* .50)],
+      getLineColor: d => [0, 0, 0],
+      onHover: (info, event) => console.log('Hovered:', info.object),
+      onClick: ({object}) => object
     });  
    
     const layerUK = new ScatterplotLayer({
@@ -70,7 +73,6 @@ const data = [
       getFillColor: d => [255, 140, 0],
       getLineColor: d => [0, 0, 0]
     });
-
 
     const lineTest = new LineLayer({id: 'line-layer', data});
 
@@ -99,6 +101,8 @@ const data = [
     //   zoom: 11
     // });
 
+    const [hoverInfo, setHoverInfo] = useState();
+    
     const [viewState, setViewState] = React.useState({
       longitude: -85,
       latitude: 35,
@@ -106,11 +110,47 @@ const data = [
       pitch: 60,
       bearing: -50,
     });
+//***
+  const deckRef = useRef(null);
+
+  const onClick = useCallback(event => {
+    const pickInfo = deckRef.current.pickObject({
+      x: event.clientX,
+      y: event.clientY,
+      radius: 1
+    });
+    console.log(pickInfo.coordinate, pickInfo.object);
+  }, [])
+
+  const onHover = useCallback(event => {
+    const hoverInfo = deckRef.current.onHover({
+      x: event.clientX,
+      y: event.clientY,
+      radius: 1
+    });
+    console.log(hoverInfo.coordinate, hoverInfo.object);
+  }, [])
+
+
+  // function getTooltip({object}) {
+  //   return object && object.properties;
+  // }
+
+  const getTooltip = info => {
+    if (!info.object) {
+      return null;
+    }
+
+
+    return `${info.object.lat} per 100K residents`;
+  };
+  
+//*** 
 
   return (
    
-
     /* DECKGL WORKING EXAMPLE */
+    <div onClick={onClick}>
     <Map
     {...viewState}
     onMove={evt => setViewState(evt.viewState)}
@@ -118,19 +158,29 @@ const data = [
       mapStyle="mapbox://styles/erickerney/cl0l6ydmk000d14slnsws819a"
       mapboxAccessToken={MAPBOX_ACCESS_TOKEN}
     >
+      
     <DeckGL 
+      ref={deckRef}
       initialViewState={viewState} 
       controller={true}
       layers={[layerStations]}
+      getTooltip={getTooltip}
+      // getTooltip={() => ({
+      //   text: 'Testing tooltip text'
+      // })}
       >
+        
       <Map 
         mapStyle="mapbox://styles/erickerney/cl0l6ydmk000d14slnsws819a" 
-        mapboxAccessToken={MAPBOX_ACCESS_TOKEN} 
+        mapboxAccessToken={MAPBOX_ACCESS_TOKEN}
+        
       />
+     
       {/* <LineLayer id="line-layer" data={data} /> */}
     </DeckGL>
+    
     </Map>
-
+  </div>
 
     /* REACT MAP GL WORKING EXAMPLE */
     // <Map
