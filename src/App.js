@@ -77,79 +77,21 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
     ${info.object.elevation}`;
   };
 
-  // const onClick = info => {
-  //   if (!info.object) {
-  //     return null;
-  //   }
-  //   console.log(info.devicePixel);
-  //   //console.log(event);
-  //   return (
-  //     <div anchor="top" className="tooltip interactive" style={{left: info.devicePixel[0], top: info.devicePixel[0]}}>
-  //       <div key={info.object.desc}>
-  //         <h5>{info.object.desc}</h5>
-  //         <div>{info.object.id}</div>
-  //         <div>{info.object.elevation}</div>
-  //      </div>
-  //     </div>
-  //   )
-  //   };
-  
-
   const [selected, setSelected] = useState(null);
   const [toggle, setToggle] = useState(false);
   const [showPopup, setShowPopup] = React.useState(true);
 
-  // next example
-  const imageUrl = "127.0.0.1:5000/RIFLE%20GARFIELD%20CO%20AP";
-  const [img, setImg] = useState();
-  const fetchImage = async () => {
-    const res = await fetch(imageUrl);
-    const imageBlob = await res.blob();
-    const imageObjectURL = URL.createObjectURL(imageBlob);
-    setImg(imageObjectURL);
-  };
+  const [features, setFeatures] = useState({});
 
-  useEffect(() => {
-    fetchImage();
+  const onClick = useCallback(e => {
+    setFeatures(currFeatures => {
+    console.log(e);  
+    return e;
+    });
   }, []);
-
- 
-
-
-  const queryClient = new QueryClient();
-  const [imageData, setImageData] = useState();
-  function Example() {
-       const { isLoading, error, data } = useQuery('repoData', () =>
-          fetch('127.0.0.1:5000/RIFLE%20GARFIELD%20CO%20AP')
-          .then(response => response.blob())
-          .then(image => URL.createObjectURL(image))
-          .then(localUrl => setImageData(localUrl))
-          .then(res => console.log(res))
-            // // Create a local URL of that image
-            // const localUrl = URL.createObjectURL(image);
-            // setImageData(localUrl);
-
-        //  .then(res => res.blob())
-        //  .then(resBlob => URL.createObjectURL(resBlob))
-        //  .then(ImageObjectURL => setImg(ImageObjectURL))
-        //  .then(res => console.log(img))
-        //   //URL.createObjectURL(res.blob())
-         //.then(res => console.log(res))
-       );
-
-       if (isLoading) return 'Loading...';
-       if (error) return 'An error has occurred: ' + error.message;
-       return (
-          <div>{data}
-            
-           <img src={data}/>
-          </div>
-       )
-     };
 
   return (
     <>
-
 
     <DeckGL 
       ref={deckRef}
@@ -159,7 +101,6 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
       ContextProvider={MapContext.Provider}
       onClick={({ x, y, coordinate, object}) => {
         // TODO: figure out how to get rid of extra click event
-        console.log(queryClient, object);
         if (object) {
           setSelected({ x, y, coordinate, object });
         } else {
@@ -169,7 +110,6 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
       }}
       //getTooltip={getTooltip}
     >
-      
       <Map reuseMaps
         {...viewState}
         onMove={evt => setViewState(evt.viewState)}
@@ -177,7 +117,7 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
         mapStyle="mapbox://styles/erickerney/cl0l6ydmk000d14slnsws819a"
         mapboxAccessToken={MAPBOX_ACCESS_TOKEN}   
       >
-       {selected && (
+       {/* {selected && (
           <Popup
             longitude={selected.coordinate[0]}
             latitude={selected.coordinate[1]}
@@ -196,48 +136,12 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
               )}
             </div>
           </Popup>
-        )}
+        )} */}
         </Map>
 
-      
-      
     </DeckGL>
-    <ControlPanel />
+    <ControlPanel station={selected && selected.object.desc} />
+
     </>
   );
 }
-
-/* REACT QUERY EXAMPLE */
-
-// const queryClient = new QueryClient()
- 
-//  export default function App() {
-//    return (
-//      <QueryClientProvider client={queryClient}>
-//        <Example />
-//      </QueryClientProvider>
-//    )
-//  }
- 
-//  function Example() {
-//    const { isLoading, error, data } = useQuery('repoData', () =>
-//      fetch('https://api.github.com/repos/tannerlinsley/react-query').then(res =>
-//        res.json().then(console.log('fetching fetch :)'))
-//      )
-//    )
- 
-//    if (isLoading) return 'Loading...'
- 
-//    if (error) return 'An error has occurred: ' + error.message
- 
-//    return (
-//      <div>
-//        <h1>{data.name}</h1>
-//        <p>{data.description}</p>
-//        <strong>👀 {data.subscribers_count}</strong>{' '}
-//        <strong>✨ {data.stargazers_count}</strong>{' '}
-//        <strong>🍴 {data.forks_count}</strong>
-//      </div>
-//    )
-//  }
-
