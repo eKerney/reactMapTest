@@ -6,6 +6,7 @@ import DeckGL from '@deck.gl/react';
 import {render} from 'react-dom';
 import { H3HexagonLayer } from "@deck.gl/geo-layers";
 import {ScatterplotLayer} from '@deck.gl/layers';
+import {HexagonLayer} from '@deck.gl/aggregation-layers';
 import {CSVLoader} from '@loaders.gl/csv';
 import {useState, useEffect, useMemo, useCallback, useRef} from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
@@ -17,29 +18,10 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
   
   export default function App() {
     
-    const layerStations = new ScatterplotLayer({
-      id: 'scatterplot-layer',
-      data: fetch(stationData)
-        .then(response => response.arrayBuffer())
-        .then(buffer => CSVLoader.parse(buffer)),
-      pickable: true,
-      opacity: 0.5,
-      stroked: true,
-      filled: true,
-      radiusScale: 6,   
-      radiusMinPixels: 5,
-      radiusMaxPixels: 100,
-      lineWidthMinPixels: 1,
-      getPosition: d => [d['lon'], d['lat']],
-      getRadius: d => Math.sqrt(d.exits),
-      getFillColor: d => [(255-(d['elevation']*.1)), (140+(d['elevation']*.001)), (d['elevation']* .50)],
-      getLineColor: d => [0, 0, 0],
-      //onHover: (info, event) => console.log('Hovered:', info.object),
-      //onClick: (info, event) => onClick(info)
-    });  
+    
    
     const layers = [
-     new H3HexagonLayer({
+     new HexagonLayer({
       id: "H3 Radio Sources",
       data: HEX_DATA,
       pickable: true,
@@ -54,14 +36,79 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
     })
     ];
 
+    // station point locations layer
+    const noaaStations = new ScatterplotLayer({
+      id: 'scatterplot-layer',
+      data: fetch(stationData)
+        .then(response => response.arrayBuffer())
+        .then(buffer => CSVLoader.parse(buffer)),
+      pickable: true,
+      opacity: 0.3,
+      stroked: true,
+      filled: true,
+      radiusScale: 6,   
+      radiusMinPixels: 7, 
+      radiusMaxPixels: 100,
+      lineWidthMinPixels: 1,
+      getPosition: d => [d['lon'], d['lat']],
+      getRadius: d => Math.sqrt(d.exits),
+      getFillColor: d => [(255-(d['elevation']*.1)), (140+(d['elevation']*.001)), (d['elevation']* .50)],
+      getLineColor: d => [0, 0, 0, 0],
+      autoHighlight: true,
+      highlightColor: [0, 255, 0]
+      //onHover: (info, event) => console.log('Hovered:', info.object),
+      //onClick: (info, event) => onClick(info)
+    });  
+
+    // specs for hex aggrgation layer
+    const colorRange = [
+      [1, 152, 189],
+      [73, 227, 206],
+      [216, 254, 181],
+      [254, 237, 177],
+      [254, 173, 84],
+      [209, 55, 78]
+    ];
+    const material = {
+      ambient: 0.64,
+      diffuse: 0.6,
+      shininess: 32,
+      specularColor: [51, 51, 51]
+    };
+    const radius = 60000, upperPercentile = 100, coverage = 1;
+    // end of hex specs
+    const stationsHex = [ 
+      new HexagonLayer({
+        id: 'heatmap',
+        colorRange,
+        coverage,
+        data: fetch(stationData)
+              .then(response => response.arrayBuffer())
+              .then(buffer => CSVLoader.parse(buffer)),
+        elevationRange: [0, 300000],
+        elevationScale: 5,
+        extruded: true,
+        getPosition: d => [d.lon,d.lat],
+        pickable: true,
+        radius,
+        upperPercentile,
+        material,
+        opacity: 0.1,
+        transitions: {
+          elevationScale: 3000
+        }
+      }),
+      noaaStations,
+     ];
+
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiZXJpY2tlcm5leSIsImEiOiJja2FjbTNiMXcwMXp1MzVueDFjdDNtcW92In0.LW0qdB-2FmA3UK51M67fAQ';
     
     const [viewState, setViewState] = React.useState({
-      longitude: -95,
-      latitude: 35,
-      zoom: 3,
-      pitch:40,
-      bearing: 0,
+      longitude: -97,
+      latitude: 37,
+      zoom: 4,
+      pitch: 60,
+      bearing: -60,
     });
     
   const [hoverInfo, setHoverInfo] = useState();  
@@ -71,10 +118,10 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
     if (!info.object) {
       return null;
     }
-    return `\
+    return`\
     ${info.object.desc}
     ${info.object.id}
-    ${info.object.elevation}`;
+    ${info.object.elevation} elev m.`;
   };
 
   const [selected, setSelected] = useState(null);
@@ -97,7 +144,7 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
       ref={deckRef}
       initialViewState={viewState} 
       controller={true}
-      layers={[layerStations]}
+      layers={[noaaStations]}
       ContextProvider={MapContext.Provider}
       onClick={({ x, y, coordinate, object}) => {
         // TODO: figure out how to get rid of extra click event
@@ -108,7 +155,7 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
           setSelected(null);
         }
       }}
-      //getTooltip={getTooltip}
+      getTooltip={getTooltip} 
     >
       <Map reuseMaps
         {...viewState}
