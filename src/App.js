@@ -9,8 +9,10 @@ import {ScatterplotLayer} from '@deck.gl/layers';
 import {HexagonLayer} from '@deck.gl/aggregation-layers';
 import {CSVLoader} from '@loaders.gl/csv';
 import {useState, useEffect, useMemo, useCallback, useRef} from 'react';
-import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
+//import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
 import ControlPanel from './control-panel';
+import {PointCloudLayer} from '@deck.gl/layers';
+import {COORDINATE_SYSTEM, OrbitView, LinearInterpolator} from '@deck.gl/core';
 
 const HEX_DATA = "https://raw.githubusercontent.com/chriszrc/foss4g-2021-react-mapbox/main/deck-layers-map/public/data/hex_radio_coverage.json";
 const stationData = 'https://raw.githubusercontent.com/eKerney/reactMapTest/main/src/noaaAptEditedCol.csv';
@@ -18,8 +20,28 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
   
   export default function App() {
     
+    const pointCloud = new PointCloudLayer({
+      id: 'PointCloudLayer',
+      data: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/pointcloud.json',
+      /* props from PointCloudLayer class */
+      getColor: d => d.color,
+      getNormal: d => d.normal,
+      getPosition: d => d.position,
+      // material: true,
+      pointSize: 2,
+      // sizeUnits: 'pixels',
+      /* props inherited from Layer class */
+      // autoHighlight: false,
+      coordinateOrigin: [-122.4, 37.74],
+      coordinateSystem: COORDINATE_SYSTEM.METER_OFFSETS,
+      // highlightColor: [0, 0, 128, 128],
+      // modelMatrix: null,
+      // opacity: 1,
+      pickable: false,
+      // visible: true,
+      // wrapLongitude: false,
+    });
     
-   
     const layers = [
      new HexagonLayer({
       id: "H3 Radio Sources",
@@ -77,6 +99,7 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
     };
     const radius = 60000, upperPercentile = 100, coverage = 1;
     // end of hex specs
+
     const stationsHex = [ 
       new HexagonLayer({
         id: 'heatmap',
@@ -110,6 +133,15 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
       pitch: 60,
       bearing: -60,
     });
+
+    const [viewState2, setViewState2] = React.useState({
+      longitude: -122.4,
+      latitude: 37.74,
+      zoom: 13,
+      maxZoom: 20,
+      pitch: 60,
+      bearing: 0
+    });
     
   const [hoverInfo, setHoverInfo] = useState();  
   const deckRef = useRef(null);
@@ -123,19 +155,17 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
     ${info.object.id}
     ${info.object.elevation} elev m.`;
   };
-
-  const [selected, setSelected] = useState(null);
-  const [toggle, setToggle] = useState(false);
-  const [showPopup, setShowPopup] = React.useState(true);
-
-  const [features, setFeatures] = useState({});
-
   const onClick = useCallback(e => {
     setFeatures(currFeatures => {
     console.log(e);  
     return e;
     });
   }, []);
+
+  const [selected, setSelected] = useState(null);
+  const [toggle, setToggle] = useState(false);
+  const [showPopup, setShowPopup] = React.useState(true);
+  const [features, setFeatures] = useState({});
 
   return (
     <>
