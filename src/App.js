@@ -190,7 +190,7 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
       <Map reuseMaps
         {...viewState}
         onMove={evt => setViewState(evt.viewState)}
-        style={{width: '100vw', height: '100vh'}}
+        style={{width: '1000', height: '1000'}}
         mapStyle="mapbox://styles/erickerney/cl0l6ydmk000d14slnsws819a"
         mapboxAccessToken={MAPBOX_ACCESS_TOKEN}   
       >
