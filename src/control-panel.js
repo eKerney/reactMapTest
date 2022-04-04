@@ -1,53 +1,50 @@
 import * as React from 'react';
-
-// import { Slider } from 'antd';
-
-// import 'antd/lib/slider/style/index.css';
-// import 'antd/lib/tooltip/style/index.css';
-// import 'antd/lib/tooltip/style/index.less';
-// import 'antd/lib/tooltip/style/rtl.less';
 import Slider from '@mui/material/Slider';
 import Box from '@mui/material/Box';
+import {useState, useEffect, useMemo, useCallback, useRef} from 'react';
+import * as ReactDOM from 'react-dom';
 
-//import 'atd/dist/antd.css'
-//import './App.css'
 // prodURL = 'https://noaaflaskapi.herokuapp.com/station/'
 // localURL = 'http://127.0.0.1:5000/'
 
 function ControlPanel(props) {
-  const marks = {
-    0: 'JAN',
-    9.1 : 'FEB',
-    18.2: 'MAR',
-    27.2: 'APR',
-    36.3: 'MAY',
-    45.4: 'JUN',
-    54.5: 'JUL',
-    63.6: 'AUG',
-    72.7: 'SEP',
-    81.8: 'OCT',
-    90.9: 'NOV',
-    100: 'DEC',
-  };
-
-  function onAfterChange(value) {
-    console.log(marks[value]);
-  }
-  function formatter(value) {
-    return `${marks[value]}`;
-  };
+  const marks = [
+    {value: 0, label: 'JAN'},
+    {value: 10, label: 'FEB'},
+    {value: 20, label: 'MAR'},
+    {value: 30, label: 'APR'},
+    {value: 40, label: 'MAY'},
+    {value: 50, label: 'JUN'},
+    {value: 60, label: 'JUL'},
+    {value: 70, label: 'AUG'},
+    {value: 80, label: 'SEP'},
+    {value: 90, label: 'OCT'},
+    {value: 100, label: 'NOV'},
+    {value: 110, label: 'DEC'},
+  ];
   
-  function valuetext(value) {
-    return `${value}°C`;
-  }
+  const [month, setMonth] = useState(null);
+
+  const onChange = (e, v) => console.log(e, v);
+  const OnChangeCommitted = (e, v) => {
+    //console.log(props);
+    //console.log(e, v);
+    };
+  const valueLabelFormat = (val) => `${(marks.find(m => m.value === val)).label}`;
+  useEffect(() => {
+    //console.log(props, month.mon);
+    
+    const panel = !month ? '' : document.getElementsByClassName('control-panel');
+    console.log(panel);
+
+  
+  });
 
   return !props.station ? (
     <div className="control-panel">
       <h2>Operational Weather Suitability</h2>
       <p>NOAA GHCN Stations Climate Normals</p>
       <p>Click on a Station for Climate Chart - Data: <a href="https://www.ncdc.noaa.gov/cdo-web/" target="_blank" rel="noopener noreferrer">NOAA Climate Data</a></p>
-     
-      
       <hr style={{width: '800px', marginLeft: '-100px', marginTop: '26px'}}/>
       <br />
     </div>
@@ -68,15 +65,23 @@ function ControlPanel(props) {
          <hr style={{width: '800px', marginLeft: '-100px'}}/>
          <p></p>
          <Slider
-         
          aria-label="Temperature"
          defaultValue={30}
-         getAriaValueText={valuetext}
+         //getAriaValueText={valuetext}
          valueLabelDisplay="auto"
          step={10}
-         marks
+         marks={marks}
          min={0}
          max={110}
+         valueLabelFormat={valueLabelFormat}
+         //onChange={onChange}
+         onChangeCommitted={(e, v) => {
+           //console.log(props, e, v, `${(marks.find(m => m.value === v)).label}`);
+           const mon = `${(marks.find(m => m.value === v)).label}`;
+           setMonth({props, mon});
+           
+           } 
+         }
        />
       </div>
     
@@ -105,4 +110,4 @@ function ControlPanel(props) {
     
 }
 
-export default React.memo(ControlPanel);
+export default React(ControlPanel);
