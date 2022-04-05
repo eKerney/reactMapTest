@@ -51,44 +51,37 @@ function ControlPanel(props) {
   // END PANEL NO SLIDER
     : 
     props.station && month ? (
-    <div className="control-panel" style={{height: '1000px'}}>
+    <div className="control-panel" style={{height: '1200px'}}>
       <h2>Operational Weather Suitability</h2>
       <p>NOAA GHCN Stations Climate Normals</p>
       <p>Click on a Station for Climate Chart - Data: <a href="https://www.ncdc.noaa.gov/cdo-web/" target="_blank" rel="noopener noreferrer">NOAA Climate Data</a></p>
       <hr style={{width: '800px', marginLeft: '-100px', marginBottom: '10px', marginTop: '26px'}}/>
       <br />
       <div style={{position: 'absolute'}}>
-        <iframe src={`${prodURLyear}${props.station}`} />
+        <iframe className='iframe-year' title='yearFrame' src={`${prodURLyear}${props.station}`} />
       </div>
       <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
        <hr style={{width: '800px', marginLeft: '-100px'}}/>
        <p></p>
         <Slider name='monthSlider' aria-label="Temperature" defaultValue={0} valueLabelDisplay="auto" step={10} marks={marks}
-          min={0} max={110} valueLabelFormat={valueLabelFormat}
+          min={0} max={110} valueLabelFormat={valueLabelFormat} 
           onChangeCommitted={(e, v) => setMonth({mon: `${(marks.find(m => m.value === v)).label}`, sta: props.station})}
         />
         <div style={{position: 'absolute'}}>
-        <iframe src={`${prodURLmonth}?station=${props.station}&month=${month.mon}`} />
-      </div>
-      <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-      <hr style={{width: '800px', marginLeft: '-100px'}}/>
-       <p></p>
-        <Slider name='daySlider' aria-label="Temperature" defaultValue={0} valueLabelDisplay="auto" step={10} marks={marks}
-          min={0} max={110} valueLabelFormat={valueLabelFormat}
-          onChangeCommitted={(e, v) => setMonth({mon: `${(marks.find(m => m.value === v)).label}`, sta: props.station})}
-        />
+          <iframe style={{overflow: 'hidden', padding: '0px', height: '2000px'}} className="frame-month" title='monthFrame' src={`${prodURLmonth}?station=${props.station}&month=${month.mon}`} />
+        </div>
     </div>
     ) :
     // START PANEL WITH MONTH SLIDER
     (     
-      <div className="control-panel" style={{height: '800px'}}>
+      <div className="control-panel" style={{height: '600px'}}>
       <h2>Operational Weather Suitability</h2>
       <p>NOAA GHCN Stations Climate Normals</p>
       <p>Click on a Station for Climate Chart - Data: <a href="https://www.ncdc.noaa.gov/cdo-web/" target="_blank" rel="noopener noreferrer">NOAA Climate Data</a></p>
       <hr style={{width: '800px', marginLeft: '-100px', marginBottom: '10px', marginTop: '26px'}}/>
       <br />
       <div style={{position: 'absolute'}}>
-        <iframe src={`${prodURLyear}${props.station}`} />
+        <iframe className='iframe-year' title='yearFrame' src={`${prodURLyear}${props.station}`} />
       </div>
       <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
        <hr style={{width: '800px', marginLeft: '-100px'}}/>

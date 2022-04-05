@@ -182,15 +182,7 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
       controller={true}
       layers={[noaaStations]}
       ContextProvider={MapContext.Provider}
-      onClick={({ x, y, coordinate, object}) => {
-        // TODO: figure out how to get rid of extra click event
-        if (object) {
-          setSelected({ x, y, coordinate, object });
-        } else {
-          // clicked off an object
-          setSelected(null);
-        }
-      }}
+      onClick={({ x, y, coordinate, object}) => object ? (setSelected({ x, y, coordinate, object })) : setSelected(null)}
       getTooltip={getTooltip} 
     >
       <Map reuseMaps
