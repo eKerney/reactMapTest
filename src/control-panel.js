@@ -4,8 +4,8 @@ import Box from '@mui/material/Box';
 import {useState, useEffect, useMemo, useCallback, useRef} from 'react';
 import * as ReactDOM from 'react-dom';
 
-const prodURL = 'https://noaaflaskapi.herokuapp.com/station/', localURL = 'http://127.0.0.1:5000/year/';
-const localURLmonth = 'http://127.0.0.1:5000/month';
+const prodURLyear = 'https://noaaflaskapi.herokuapp.com/year/', localURLyear = 'http://127.0.0.1:5000/year/';
+const localURLmonth = 'http://127.0.0.1:5000/month', prodURLmonth = 'https://noaaflaskapi.herokuapp.com/month';
 
 function ControlPanel(props) {
   const marks = [
@@ -52,13 +52,13 @@ function ControlPanel(props) {
     : 
     props.station && month ? (
     <div className="control-panel" style={{height: '1000px'}}>
-      <h2>Operational Weather Suitability{month.mon}</h2>
+      <h2>Operational Weather Suitability</h2>
       <p>NOAA GHCN Stations Climate Normals</p>
       <p>Click on a Station for Climate Chart - Data: <a href="https://www.ncdc.noaa.gov/cdo-web/" target="_blank" rel="noopener noreferrer">NOAA Climate Data</a></p>
       <hr style={{width: '800px', marginLeft: '-100px', marginBottom: '10px', marginTop: '26px'}}/>
       <br />
       <div style={{position: 'absolute'}}>
-        <iframe src={`${localURL}${props.station}`} />
+        <iframe src={`${prodURLyear}${props.station}`} />
       </div>
       <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
        <hr style={{width: '800px', marginLeft: '-100px'}}/>
@@ -68,7 +68,7 @@ function ControlPanel(props) {
           onChangeCommitted={(e, v) => setMonth({mon: `${(marks.find(m => m.value === v)).label}`, sta: props.station})}
         />
         <div style={{position: 'absolute'}}>
-        <iframe src={`${localURLmonth}?station=${props.station}&month=${month.mon}`} />
+        <iframe src={`${prodURLmonth}?station=${props.station}&month=${month.mon}`} />
       </div>
       <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
       <hr style={{width: '800px', marginLeft: '-100px'}}/>
@@ -88,7 +88,7 @@ function ControlPanel(props) {
       <hr style={{width: '800px', marginLeft: '-100px', marginBottom: '10px', marginTop: '26px'}}/>
       <br />
       <div style={{position: 'absolute'}}>
-        <iframe src={`${localURL}${props.station}`} />
+        <iframe src={`${prodURLyear}${props.station}`} />
       </div>
       <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
        <hr style={{width: '800px', marginLeft: '-100px'}}/>
