@@ -26,44 +26,6 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
   
   export default function App() {
     
-    const pointCloud = new PointCloudLayer({
-      id: 'PointCloudLayer',
-      data: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/pointcloud.json',
-      /* props from PointCloudLayer class */
-      getColor: d => d.color,
-      getNormal: d => d.normal,
-      getPosition: d => d.position,
-      // material: true,
-      pointSize: 2,
-      // sizeUnits: 'pixels',
-      /* props inherited from Layer class */
-      // autoHighlight: false,
-      coordinateOrigin: [-122.4, 37.74],
-      coordinateSystem: COORDINATE_SYSTEM.METER_OFFSETS,
-      // highlightColor: [0, 0, 128, 128],
-      // modelMatrix: null,
-      // opacity: 1,
-      pickable: false,
-      // visible: true,
-      // wrapLongitude: false,
-    });
-    
-    const layers = [
-     new HexagonLayer({
-      id: "H3 Radio Sources",
-      data: HEX_DATA,
-      pickable: true,
-      wireframe: false,
-      filled: true,
-      extruded: true,
-      elevationScale: 10000,
-      getHexagon: (d) => d.hex,
-      getFillColor: (d) => [255, (1 - d.count / 50) * 255, 0],
-      getElevation: (d) => d.count,
-      opacity: 0.2,
-    })
-    ];
-
     // station point locations layer
     const noaaStations = new ScatterplotLayer({
       id: 'scatterplot-layer',
@@ -133,24 +95,13 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiZXJpY2tlcm5leSIsImEiOiJja2FjbTNiMXcwMXp1MzVueDFjdDNtcW92In0.LW0qdB-2FmA3UK51M67fAQ';
     
     const [viewState, setViewState] = React.useState({
-      longitude: -97,
-      latitude: 37,
+      longitude: -90,
+      latitude: 30,
       zoom: 4,
       pitch: 60,
       bearing: -60,
     });
 
-    const [viewState2, setViewState2] = React.useState({
-      longitude: -122.4,
-      latitude: 37.74,
-      zoom: 13,
-      maxZoom: 20,
-      pitch: 60,
-      bearing: 0
-    });
-    
-  const [hoverInfo, setHoverInfo] = useState();  
-  const deckRef = useRef(null);
 
   const getTooltip = info => {
     if (!info.object) {
@@ -172,10 +123,12 @@ const testData = 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/ex
   const [toggle, setToggle] = useState(false);
   const [showPopup, setShowPopup] = React.useState(true);
   const [features, setFeatures] = useState({});
+  const [hoverInfo, setHoverInfo] = useState();  
+  const deckRef = useRef(null);
+
 
   return (
     <>
-
     <DeckGL 
       ref={deckRef}
       initialViewState={viewState} 
