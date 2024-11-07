@@ -4,8 +4,9 @@ import Box from '@mui/material/Box';
 import {useState, useEffect, useMemo, useCallback, useRef} from 'react';
 import * as ReactDOM from 'react-dom';
 
-const prodURLyear = 'https://noaaflaskapi.herokuapp.com/year/', localURLyear = 'http://127.0.0.1:5000/year/';
-const localURLmonth = 'http://127.0.0.1:5000/month', prodURLmonth = 'https://noaaflaskapi.herokuapp.com/month';
+const prodURLyear = 'https://noaaflaskapi.onrender.com/year', localURLyear = 'http://127.0.0.1:5000/year/';
+
+const localURLmonth = 'http://127.0.0.1:5000/month', prodURLmonth = 'https://noaaflaskapi.onrender.com/year/month';
 
 function ControlPanel(props) {
   const marks = [
